@@ -3,7 +3,9 @@
 namespace App\Entity;
 
 use App\Repository\InstrumentRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\FingeringPerInstrumentPitch;
 
 #[ORM\Entity(repositoryClass: InstrumentRepository::class)]
 class Instrument
@@ -18,6 +20,31 @@ class Instrument
 
     #[ORM\Column(type: 'string', length: 255)]
     private $transposition;
+
+    #[ORM\OneToMany(mappedBy: "instrument", targetEntity: FingeringPerInstrumentPitch::class)]
+    private $fingeringPerInstrumentPitch;
+
+    public function __construct()
+    {
+        $this->fingeringPerInstrumentPitch = new ArrayCollection();
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getFingeringPerInstrumentPitch(): ArrayCollection
+    {
+        return $this->fingeringPerInstrumentPitch;
+    }
+
+    /**
+     * @param ArrayCollection $fingeringPerInstrumentPitch
+     */
+    public function setFingeringPerInstrumentPitch(ArrayCollection $fingeringPerInstrumentPitch): void
+    {
+        $this->fingeringPerInstrumentPitch = $fingeringPerInstrumentPitch;
+    }
+
 
     public function getId(): ?int
     {

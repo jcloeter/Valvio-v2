@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\PitchRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PitchRepository::class)]
@@ -24,6 +25,31 @@ class Pitch
 
     #[ORM\Column(type: 'integer')]
     private $midiNoteId;
+
+    #[ORM\OneToMany(mappedBy: "pitch", targetEntity: FingeringPerInstrumentPitch::class)]
+    private $fingeringPerInstrumentPitch;
+
+    public function __construct()
+    {
+        $this->fingeringPerInstrumentPitch = new ArrayCollection();
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getFingeringPerInstrumentPitch(): ArrayCollection
+    {
+        return $this->fingeringPerInstrumentPitch;
+    }
+
+    /**
+     * @param ArrayCollection $fingeringPerInstrumentPitch
+     */
+    public function setFingeringPerInstrumentPitch(ArrayCollection $fingeringPerInstrumentPitch): void
+    {
+        $this->fingeringPerInstrumentPitch = $fingeringPerInstrumentPitch;
+    }
+
 
     public function getId(): ?int
     {

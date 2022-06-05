@@ -5,6 +5,7 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Service\QuizConstructor;
 
 class QuizController extends AbstractController
 {
@@ -33,6 +34,18 @@ class QuizController extends AbstractController
             ],
         ]);
     }
+
+    #[Route('/quiz/add-to-db', methods: ['GET'], name: 'grade_quiz')]
+    public function addDataToQuiz(QuizConstructor $quizConstructor): JsonResponse
+    {
+        $quizConstructor->addFingeringToDb();
+
+        return $this->json([
+          'message' => 'just added some data...'
+        ]);
+    }
+
+
 
 
 }
