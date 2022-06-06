@@ -17,14 +17,14 @@ class Pitch
     #[ORM\Column(type: 'string', length: 25)]
     private $name;
 
-    #[ORM\Column(type: 'integer')]
-    private $octave;
+//    #[ORM\Column(type: 'integer')]
+//    private $octave;
 
     #[ORM\Column(type: 'blob', nullable: true)]
     private $image_url;
 
-    #[ORM\Column(type: 'integer')]
-    private $midiNoteId;
+//    #[ORM\Column(type: 'integer')]
+//    private $midiNoteId;
 
     #[ORM\OneToMany(mappedBy: "pitch", targetEntity: FingeringPerInstrumentPitch::class)]
     private $fingeringPerInstrumentPitch;
@@ -68,17 +68,17 @@ class Pitch
         return $this;
     }
 
-    public function getOctave(): ?int
-    {
-        return $this->octave;
-    }
+//    public function getOctave(): ?int
+//    {
+//        return $this->octave;
+//    }
 
-    public function setOctave(int $octave): self
-    {
-        $this->octave = $octave;
-
-        return $this;
-    }
+//    public function setOctave(int $octave): self
+//    {
+//        $this->octave = $octave;
+//
+//        return $this;
+//    }
 
     public function getImageUrl()
     {
@@ -92,15 +92,15 @@ class Pitch
         return $this;
     }
 
-    public function getMidiNoteId(): ?int
-    {
-        return $this->midiNoteId;
-    }
-
-    public function setMidiNoteId(int $midiNoteId): self
-    {
-        $this->midiNoteId = $midiNoteId;
-
-        return $this;
-    }
+//    public function getMidiNoteId(): ?int
+//    {
+//        return $this->midiNoteId;
+//    }
+//
+//    public function setMidiNoteId(int $midiNoteId): self
+//    {
+//        $this->midiNoteId = $midiNoteId;
+//
+//        return $this;
+//    }
 }
