@@ -7,6 +7,8 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use App\Entity\Pitch;
 use App\Entity\Octave;
+use App\Entity\Instrument;
+use App\Entity\FingerPosition;
 
 class AppFixtures extends Fixture
 {
@@ -16,6 +18,8 @@ class AppFixtures extends Fixture
         $this->addAccidentals($manager);
         $this->addPitches($manager);
         $this->addOctave($manager);
+        $this->addInstrument($manager);
+        $this->addFingerPosition($manager);
         $manager->flush();
     }
 
@@ -93,6 +97,48 @@ class AppFixtures extends Fixture
 
             $manager->persist($octave);
             $this->addReference("oct" . $i, $octave);
+        }
+    }
+
+    public function addInstrument(ObjectManager $manager)
+    {
+        $instrumentArr = [
+            0 => [ "Trumpet", "Bb" ],
+            1 => [ "French Horn", "F"],
+            2 => [ "Euphonium", "C" ]
+        ];
+
+        foreach ($instrumentArr as $i => $instrObj)
+        {
+            $instrument = new Instrument();
+            $instrument->setName($instrObj[0]);
+            $instrument->setTransposition($instrObj[1]);
+
+            $manager->persist($instrument);
+            $this->addReference("instr" . $i, $instrument);
+        }
+    }
+
+    public function addFingerPosition(ObjectManager $manager)
+    {
+        $positionArr = [
+            0 => [ 0 ],
+            1 => [ 1],
+            2 => [ 2],
+            3 => [ 12],
+            4 => [ 23],
+            5 => [ 13],
+            6 => [ 123],
+            7 => [ 3 ]
+        ];
+
+        foreach ($positionArr as $i => $posObj)
+        {
+            $position = new FingerPosition();
+            $position->setPosition($posObj[0]);
+
+            $manager->persist($position);
+            $this->addReference("pos" . $i, $position);
         }
     }
 }
