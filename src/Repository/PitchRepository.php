@@ -39,6 +39,16 @@ class PitchRepository extends ServiceEntityRepository
         }
     }
 
+    public function findOneByPitchName($value): ?Pitch
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.name = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
 //    /**
 //     * @return Pitch[] Returns an array of Pitch objects
 //     */
