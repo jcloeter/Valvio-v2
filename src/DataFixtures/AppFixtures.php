@@ -13,6 +13,8 @@ use App\Entity\FingerPosition;
 class AppFixtures extends Fixture
 {
 
+    //Start here: double check that the db schema is what you want. Otherwise it may be alot of work to change all of this over and over again.
+
     public function load(ObjectManager $manager): void
     {
         $this->addAccidentals($manager);
