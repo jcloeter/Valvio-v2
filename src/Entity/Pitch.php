@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\PitchRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PitchRepository::class)]
@@ -17,39 +18,30 @@ class Pitch
     #[ORM\Column(type: 'string', length: 25)]
     private $name;
 
-//    #[ORM\Column(type: 'integer')]
-//    private $octave;
-
     #[ORM\Column(type: 'blob', nullable: true)]
     private $image_url;
 
-//    #[ORM\Column(type: 'integer')]
-//    private $midiNoteId;
+    #[ORM\OneToMany(mappedBy: 'pitch', targetEntity: MidiNumber::class, orphanRemoval: true)]
+    private $midiNumbers;
 
-    #[ORM\OneToMany(mappedBy: "pitch", targetEntity: FingeringPerInstrumentPitch::class)]
-    private $fingeringPerInstrumentPitch;
+    #[ORM\ManyToOne(targetEntity: Accidental::class, inversedBy: "pitches")]
+    private $accidental;
 
-    public function __construct()
+    /**
+     * @return mixed
+     */
+    public function getAccidental()
     {
-        $this->fingeringPerInstrumentPitch = new ArrayCollection();
+        return $this->accidental;
     }
 
     /**
-     * @return ArrayCollection
+     * @param mixed $accidental
      */
-    public function getFingeringPerInstrumentPitch(): ArrayCollection
+    public function setAccidental($accidental): void
     {
-        return $this->fingeringPerInstrumentPitch;
+        $this->accidental = $accidental;
     }
-
-    /**
-     * @param ArrayCollection $fingeringPerInstrumentPitch
-     */
-    public function setFingeringPerInstrumentPitch(ArrayCollection $fingeringPerInstrumentPitch): void
-    {
-        $this->fingeringPerInstrumentPitch = $fingeringPerInstrumentPitch;
-    }
-
 
     public function getId(): ?int
     {
@@ -68,18 +60,6 @@ class Pitch
         return $this;
     }
 
-//    public function getOctave(): ?int
-//    {
-//        return $this->octave;
-//    }
-
-//    public function setOctave(int $octave): self
-//    {
-//        $this->octave = $octave;
-//
-//        return $this;
-//    }
-
     public function getImageUrl()
     {
         return $this->image_url;
@@ -92,15 +72,33 @@ class Pitch
         return $this;
     }
 
-//    public function getMidiNoteId(): ?int
-//    {
-//        return $this->midiNoteId;
-//    }
-//
-//    public function setMidiNoteId(int $midiNoteId): self
-//    {
-//        $this->midiNoteId = $midiNoteId;
-//
-//        return $this;
-//    }
+/**
+ * @return Collection<int, MidiNumber>
+ */
+public function getMidiNumbers(): Collection
+{
+    return $this->midiNumbers;
+}
+
+public function addMidiNumber(MidiNumber $midiNumber): self
+{
+    if (!$this->midiNumbers->contains($midiNumber)) {
+        $this->midiNumbers[] = $midiNumber;
+        $midiNumber->setPitch($this);
+    }
+
+    return $this;
+}
+
+public function removeMidiNumber(MidiNumber $midiNumber): self
+{
+    if ($this->midiNumbers->removeElement($midiNumber)) {
+        // set the owning side to null (unless already changed)
+        if ($midiNumber->getPitch() === $this) {
+            $midiNumber->setPitch(null);
+        }
+    }
+
+    return $this;
+}
 }

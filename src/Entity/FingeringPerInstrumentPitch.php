@@ -16,8 +16,8 @@ class FingeringPerInstrumentPitch
     #[ORM\ManyToOne(targetEntity: Instrument::class, inversedBy: "fingeringPerInstrumentPitch")]
     private $instrument;
 
-    #[ORM\ManyToOne(targetEntity: Pitch::class, inversedBy: "fingeringPerInstrumentPitch")]
-    private $pitch;
+    #[ORM\ManyToOne(targetEntity: MidiNumber::class, inversedBy: "fingeringPerInstrumentPitch")]
+    private $midiNumber;
 
     #[ORM\ManyToOne(targetEntity: FingerPosition::class)]
     private $fingeringPosition;
@@ -27,26 +27,31 @@ class FingeringPerInstrumentPitch
         return $this->id;
     }
 
-    public function getInstrumentId(): ?int
+
+    /**
+     * @return mixed
+     */
+    public function getInstrument()
     {
-        return $this->instrumentId;
+        return $this->instrument;
     }
 
-    public function setInstrumentId(int $instrumentId): self
+    /**
+     * @param mixed $instrument
+     */
+    public function setInstrument($instrument): void
     {
-        $this->instrumentId = $instrumentId;
-
-        return $this;
+        $this->instrument = $instrument;
     }
 
-    public function getPitchId(): ?int
+    public function getMidiNumberId(): ?int
     {
-        return $this->pitchId;
+        return $this->midiNumber;
     }
 
-    public function setPitchId(int $pitchId): self
+    public function setPitch(MidiNumber $midiNumber): self
     {
-        $this->pitchId = $pitchId;
+        $this->midiNumber = $midiNumber;
 
         return $this;
     }
@@ -56,10 +61,22 @@ class FingeringPerInstrumentPitch
         return $this->fingeringPosition;
     }
 
-    public function setFingeringPosition(int $fingeringPosition): self
+    public function setFingeringPosition(FingerPosition $fingeringPosition): self
     {
         $this->fingeringPosition = $fingeringPosition;
 
         return $this;
     }
 }
+
+//public function getInstrumentId(): ?int
+//{
+//    return $this->instrumentId;
+//}
+//
+//public function setInstrumentId(int $instrumentId): self
+//{
+//    $this->instrumentId = $instrumentId;
+//
+//    return $this;
+//}
