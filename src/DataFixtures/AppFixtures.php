@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Accidental;
+use App\Entity\MidiNumber;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use App\Entity\Pitch;
@@ -13,7 +14,9 @@ use App\Entity\FingerPosition;
 class AppFixtures extends Fixture
 {
 
-    //Start here: double check that the db schema is what you want. Otherwise it may be alot of work to change all of this over and over again.
+    public array $pitchesArr;
+    public array $octaveArr;
+    //Start here: double check that the db schema is what you want. Otherwise, it may be a lot of work to change all of this over and over again.
 
     public function load(ObjectManager $manager): void
     {
@@ -22,11 +25,13 @@ class AppFixtures extends Fixture
         $this->addOctave($manager);
         $this->addInstrument($manager);
         $this->addFingerPosition($manager);
+        $this->addMidiNumber($manager);
         $manager->flush();
     }
 
     public function addAccidentals(ObjectManager $manager): void
     {
+        //Not sure why I started this at 1...
         $accidentalsArr = [
             1 => [ "natural" , 0],
             2 => ["sharp" , 1],
@@ -45,9 +50,45 @@ class AppFixtures extends Fixture
         }
     }
 
+    public function addMidiNumber(ObjectManager $manager)
+    {
+        $midiNum = [];
+        $startMidiNum = 23; //This represents a Cb1
+
+        //Some midi numbers are repeated, this array shows the general pattern beginning from a Cb:
+        $midiStartNumArray = [
+           23, 24, 25, 25, 26, 27, 27, 28, 29, 28, 29, 30, 30, 31, 32, 32, 33, 34, 34, 35, 36
+        ];
+
+
+        //midiNum, pitchId, octaveId
+        foreach ($this->octaveArr as $octIndex => $octave)
+        {
+            foreach ($this->pitchesArr as $i => $pitchArr)
+            {
+                echo $startMidiNum;
+                $midiNum[] = [($midiStartNumArray[$i] + (12 * ($octIndex))), $this->getReference("pitch".$i), $this->getReference("oct".$octIndex)];
+                $startMidiNum++;
+            }
+        }
+
+        foreach ($midiNum as $i => $midiArr)
+        {
+            $midi = new MidiNumber();
+            $midi->setMidiNumber($midiArr[0]);
+            $midi->setPitch($midiArr[1]);
+            $midi->setOctave($midiArr[2]);
+
+            $manager->persist($midi);
+            $this->addReference("midi" . $i, $midi);
+        }
+
+
+    }
+
     public function addPitches(ObjectManager $manager): void
     {
-        $pitchesArr = [
+        $this->pitchesArr = [
             0 => ["Cb" , $this->getReference("acc3")],
             1 => ["C" , $this->getReference("acc1")],
             2 => ["C#" , $this->getReference("acc2")],
@@ -71,7 +112,7 @@ class AppFixtures extends Fixture
             20 => ["B#", $this->getReference("acc2")]
         ];
 
-        foreach($pitchesArr as $i => $pitchObj)
+        foreach($this->pitchesArr as $i => $pitchObj)
         {
             $pitch = new Pitch();
             $pitch->setName($pitchObj[0]);
@@ -85,14 +126,15 @@ class AppFixtures extends Fixture
 
     public function addOctave(ObjectManager $manager): void
     {
-        $octaveArr = [
+        $this->octaveArr = [
             0 => [ 2 ],
             1 => [ 3],
             2 => [ 4 ],
             3 => [ 5 ],
+            4 => [ 6 ],
         ];
 
-        foreach ($octaveArr as $i => $octArr)
+        foreach ($this->octaveArr as $i => $octArr)
         {
             $octave = new Octave();
             $octave->setOctave($octArr[0]);
@@ -144,3 +186,80 @@ class AppFixtures extends Fixture
         }
     }
 }
+
+
+//A not DRY graveyard:
+//$midiArr = [
+//    //Low F# through B natual
+//    0 => [54, $this->getReference("pitch11"), $this->getReference("oct1")],
+//    1 => [54, $this->getReference("pitch12"), $this->getReference("oct1")],
+//    2 => [55, $this->getReference("pitch13"), $this->getReference("oct1")],
+//    3 => [56, $this->getReference("pitch14"), $this->getReference("oct1")],
+//    4 => [56, $this->getReference("pitch15"), $this->getReference("oct1")],
+//    5 => [57, $this->getReference("pitch16"), $this->getReference("oct1")],
+//    6 => [58, $this->getReference("pitch17"), $this->getReference("oct1")],
+//    7 => [58, $this->getReference("pitch18"), $this->getReference("oct1")],
+//    7 => [59, $this->getReference("pitch19"), $this->getReference("oct1")],
+//
+//    //Low Cb through middle B
+//    7 => [59, $this->getReference("pitch20"), $this->getReference("oct2")], //Cb
+//    7 => [60, $this->getReference("pitch0"), $this->getReference("oct2")], //C
+//    7 => [61, $this->getReference("pitch1"), $this->getReference("oct2")], //
+//    7 => [61, $this->getReference("pitch2"), $this->getReference("oct2")],
+//    7 => [62, $this->getReference("pitch3"), $this->getReference("oct2")],
+//    7 => [63, $this->getReference("pitch4"), $this->getReference("oct2")],
+//    7 => [64, $this->getReference("pitch5"), $this->getReference("oct2")],
+//    7 => [64, $this->getReference("pitch6"), $this->getReference("oct2")],
+//    7 => [54, $this->getReference("pitch7"), $this->getReference("oct2")],
+//    7 => [54, $this->getReference("pitch8"), $this->getReference("oct2")],
+//    7 => [54, $this->getReference("pitch9"), $this->getReference("oct2")],
+//    7 => [54, $this->getReference("pitch10"), $this->getReference("oct2")],
+//    7 => [54, $this->getReference("pitch11"), $this->getReference("oct2")],
+//    7 => [54, $this->getReference("pitch12"), $this->getReference("oct2")],
+//    7 => [54, $this->getReference("pitch13"), $this->getReference("oct2")],
+//    7 => [54, $this->getReference("pitch14"), $this->getReference("oct2")],
+//    7 => [54, $this->getReference("pitch15"), $this->getReference("oct2")],
+//    7 => [54, $this->getReference("pitch16"), $this->getReference("oct2")],
+//    7 => [54, $this->getReference("pitch17"), $this->getReference("oct2")],
+//    7 => [54, $this->getReference("pitch18"), $this->getReference("oct2")],
+//    7 => [54, $this->getReference("pitch19"), $this->getReference("oct2")],
+//    7 => [54, $this->getReference("pitch20"), $this->getReference("oct2")],
+//
+//    //Cb in the staff to high B
+//    7 => [54, $this->getReference("pitch0"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch1"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch2"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch3"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch4"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch5"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch6"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch7"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch8"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch9"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch10"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch11"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch12"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch13"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch14"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch15"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch16"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch17"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch18"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch19"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch20"), $this->getReference("oct3")],
+//
+//    //High Cb to High F
+//    7 => [54, $this->getReference("pitch20"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch20"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch20"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch20"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch20"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch20"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch20"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch20"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch20"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch20"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch20"), $this->getReference("oct3")],
+//    7 => [54, $this->getReference("pitch20"), $this->getReference("oct3")],
+//
+//];
